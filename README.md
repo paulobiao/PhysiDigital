@@ -1,6 +1,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![AI](https://img.shields.io/badge/AI-ML%20%7C%20Data%20Analysis-purple)](#)
+[![Healthcare](https://img.shields.io/badge/Domain-Healthcare%20Analytics-ff69b4)](#)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 
 # 🦾 PhysiDigital™ — Open-Source Physiotherapy Data Intelligence System
