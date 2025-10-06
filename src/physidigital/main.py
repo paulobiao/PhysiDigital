@@ -1,27 +1,31 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import List
 
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from .models import SensorEvent, ScoreResponse
-from .rules import score_event
-import pandas as pd, io, csv
+app = FastAPI(
+    title="PhysiDigital API",
+    version="0.1.0",
+    description="Open-source physiotherapy digital assessment system — part of EB2-NIW applied cybersecurity portfolio."
+)
 
-app = FastAPI(title="PhysiDigital API", version="0.1.0")
+# Modelo de dados simulado
+class SessionData(BaseModel):
+    patient_id: str
+    movement: str
+    angle: float
+    pain_level: int
+
+class ScoreResponse(BaseModel):
+    score: float
+    recommendation: str
 
 @app.get("/health")
-def health(): return {"status": "ok"}
+def health():
+    return {"status": "ok", "system": "PhysiDigital"}
 
-@app.post("/api/v1/ingest", response_model=ScoreResponse)
-def ingest(ev: SensorEvent):
-    s, r, f = score_event(ev.model_dump())
-    return ScoreResponse(score=s, reasons=r, flags=f)
-
-@app.post("/api/v1/ingest/batch")
-async def ingest_batch(file: UploadFile = File(...)):
-    if not file.filename.endswith(".csv"):
-        raise HTTPException(400, "Upload a CSV")
-    content = await file.read()
-    df = pd.read_csv(io.BytesIO(content))
-    out = []
-    for _, row in df.iterrows():
-        s, r, f = score_event(row.to_dict())
-        out.append({"node_id": row.get("node_id"), "score": s, "reasons": r, "flags": f})
-    return {"count": len(out), "results": out}
+@app.post("/api/v1/analyze", response_model=ScoreResponse)
+def analyze_session(data: SessionData):
+    # Exemplo simples de análise
+    score = max(0, 100 - data.pain_level * 10 + (data.angle / 2))
+    recommendation = "Continue exercise" if score > 70 else "Review with physiotherapist"
+    return {"score": round(score, 2), "recommendation": recommendation}
