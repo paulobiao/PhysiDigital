@@ -1,31 +1,36 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import List
+import numpy as np
+from collections import deque
 
-app = FastAPI(
-    title="PhysiDigital API",
-    version="0.1.0",
-    description="Open-source physiotherapy digital assessment system — part of EB2-NIW applied cybersecurity portfolio."
-)
+app = FastAPI(title="PhysiDigital API", version="0.2.0")
 
-# Modelo de dados simulado
-class SessionData(BaseModel):
-    patient_id: str
-    movement: str
-    angle: float
-    pain_level: int
+class SensorData(BaseModel):
+    sensor_id: str
+    temperature: float
+    vibration: float
 
-class ScoreResponse(BaseModel):
-    score: float
-    recommendation: str
+WINDOW = 50
+temp_hist = deque(maxlen=WINDOW)
+vib_hist  = deque(maxlen=WINDOW)
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "system": "PhysiDigital"}
+    return {"status": "ok", "service": "PhysiDigital"}
 
-@app.post("/api/v1/analyze", response_model=ScoreResponse)
-def analyze_session(data: SessionData):
-    # Exemplo simples de análise
-    score = max(0, 100 - data.pain_level * 10 + (data.angle / 2))
-    recommendation = "Continue exercise" if score > 70 else "Review with physiotherapist"
-    return {"score": round(score, 2), "recommendation": recommendation}
+def zscore(value, history):
+    if len(history) < 10:  # warmup
+        return 0.0
+    mu = np.mean(history)
+    sd = np.std(history) or 1.0
+    return (value - mu) / sd
+
+@app.post("/api/v1/sensor")
+def process_sensor(data: SensorData):
+    temp_hist.append(data.temperature)
+    vib_hist.append(data.vibration)
+    zt = abs(zscore(data.temperature, temp_hist))
+    zv = abs(zscore(data.vibration, vib_hist))
+    anomaly = (zt > 3.0) or (zv > 3.0)
+    score = min(100, int((zt + zv) * 25))  # escala simples
+    return {"sensor_id": data.sensor_id, "z_temp": round(zt,2), "z_vib": round(zv,2), "anomaly": anomaly, "score": score}
