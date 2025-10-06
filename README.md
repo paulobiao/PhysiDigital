@@ -6,6 +6,10 @@
 [![Healthcare](https://img.shields.io/badge/Domain-Healthcare%20Analytics-ff69b4)](#)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 
+> **Open-Source Cybersecurity Project by Paulo Bião** — Smart infrastructure monitoring system simulating IoT/OT security and anomaly detection for EB2-NIW portfolio.
+
+# PhysiDigital™ – Smart Infrastructure Security Monitor (Open Source)
+
 # 🦾 PhysiDigital™ — Open-Source Physiotherapy Data Intelligence System
 
 **Objective**  
